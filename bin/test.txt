@@ -1,0 +1,165 @@
+Fhrt einen Befehl fr jede einzelne Datei fr einen Satz von Dateien aus.
+
+FOR %Variable IN (Satz) DO Befehl [Parameter]
+
+  %Variable   Ein ersetzbarer Parameter bestehend aus einem einzelnen
+              Buchstaben.
+  (Satz)      Ein Satz von mindestens einer Datei. Platzhalter sind zul„ssig.
+  Befehl      Befehl, der fr jede Datei ausgefhrt werden soll.
+  Parameter   Parameter und Optionen fr den angegebenen Befehl.
+
+Um den FOR-Befehl in einem Batchprogramm zu verwenden, geben Sie %%Variable
+statt %Variable an. Beachten Sie die Groá-/Kleinschreibung bei Variablen-
+namen, %i und %I sind nicht identisch.
+
+Wenn die Befehlserweiterungen aktiviert sind, werden folgende
+Erg„nzungen fr den FOR-Befehl untersttzt:
+
+FOR /D %Variable IN (Satz) DO Befehl [Parameter]
+
+    Wenn der Satz Platzhalter enth„lt, dann bezieht sich der FOR-Befehl
+    auf Verzeichnisse und nicht auf Dateien.
+
+FOR /R [[Laufwerk:]Pfad] %Variable IN (Satz) DO Befehl [Parameter]
+
+    Der FOR-Befehl wird ausgehend vom Verzeichnis [Laufwerk:]Pfad (als
+    Stammverzeichnis) fr jedes darunterliegende Verzeichnis ausgefhrt.
+    Wenn kein Verzeichnis nach der /R-Option angegeben ist, wird das aktuelle
+    Verzeichnis verwendet. Wenn der Satz nur einen einzelnen Punkt als
+    Zeichen (.) enth„lt, wird nur die Verzeichnisstruktur aufgelistet.
+
+FOR /L %Variable IN (Start,Schritt,Ende) DO Befehl [Parameter]
+
+    Der Satz ist eine Folge von Zahlen von Start bis Ende und der
+    angegebenen Schrittweite. So erstellt (1,1,5) die Folge 1 2 3 4 5 und
+    (5,-1,1) erstellt die Folge (5 4 3 2 1).
+
+FOR /F ["Optionen"] %Variable IN (Dateiensatz) DO Befehl [Parameter]
+FOR /F ["Optionen"] %Variable IN ("Zeichenfolge") DO Befehl [Parameter]
+FOR /F ["Optionen"] %Variable IN (Befehl) DO Befehl [Parameter]
+
+    oder, unter Verwendung der Option "usebackq":
+
+FOR /F ["Optionen"] %variable IN (Dateiensatz) DO Befehl [Parameter]
+FOR /F ["Optionen"] %variable IN ("Zeichenfolge") DO Befehl [Parameter]
+FOR /F ["Optionen"] %variable IN (`Befehl`) DO Befehl [Parameter]
+
+
+    Der Dateiensatz besteht aus einem oder mehreren Dateinamen. Jede Datei
+    wird ge”ffnet, gelesen und bearbeitet, dann wird mit der n„chsten Datei
+    des Satzes fortgefahren. Die Bearbeitung einer Datei erfolgt zeilenweise,
+    jede einzelne Textzeile wird ausgewertet und in die entsprechenden Token
+    (keinen oder mehrere) zerlegt. Die Befehle in der FOR-Schleife werden dann
+    mit den Variablenwerten (d.h. den gefunden Zeichenfolgen bzw. Token)
+    aufgerufen. Standardm„áig liefert "/F" den ersten, durch ein Leerzeichen
+    getrennten Token von jeder Zeile in jeder Datei. Leerzeilen werden
+    bersprungen. Das standardm„áige Verhalten bei der Analyse kann wahlweise
+    durch den Parameter "Optionen" berschrieben werden. Dies ist eine
+    Zeichenfolge in Anfhrungszeichen, welche mindestens ein Schlssel-
+    wort enth„lt, um verschiedene Parameter fr die Analyse anzugeben. Diese
+    Schlsselw”rter sind:
+
+        eol=c           - Gibt das Zeichen fr Zeilenendekommentare an
+                          (nur eins).
+        skip=n          - Gibt die Anzahl der Zeilen an, die am Anfang einer
+                          Datei bersprungen werden.
+        delims=xxx      - Gibt einen Satz von Trennzeichen an. Diese ersetzen
+                          die Standardtrennzeichen TAB und Leerzeichen.
+        tokens=x,y,m-n  - Gibt an, welche Token von jeder Zeile an die
+                          FOR-Schleife weitergegeben werden.
+                          Das fhrt dazu, dass zus„tzliche Variablen erstellt
+                          werden. Mit der Form m-n wird dabei ein Bereich vom
+                          m-ten bis zum  n-ten Token angegeben. Wenn das letzte
+                          Zeichen ein Sternchen ist, wird eine zus„tzliche
+                          Variable deklariert, die den verbleibenden Text
+                          dieser Zeile enth„lt.
+        usebackq        - Gibt an, dass die neue Semantik in Kraft ist,
+                          wobei eine Zeichenfolge in umgekehrten Anfhrungs-
+                          zeichen als Befehl ausgefhrt wird und eine
+                          Zeichenfolge in Anfhrungszeichen ein literaler
+                          Befehl ist, der die Verwendung von doppelten
+                          Anfhrungszeichen um Dateinamen in Dateien-
+                          s„tzen erlaubt.
+
+    Einige Beispiele:
+
+FOR /F "eol=; tokens=2,3* delims=, " %i in (Datei.txt) do @echo %i %j %k
+
+    Dadurch wird jede Zeile in der Datei "Datei.txt" ausgewertet, Zeilen
+    die mit einem Semikolon beginnen werden ignoriert, fr den 2. und
+    3. Token jeder Zeile werden die Befehle in der FOR-Schleife ausge-
+    fhrt. Trennzeichen sind Kommas und/oder Leerzeichen. In der FOR-
+    Schleife wird der Ausdruck "%i" verwendet, um den 2. Token zu
+    erhalten, "%j" fr den 3. Token und "%k", um alle brigen Token
+    zu erhalten. Dateinamen, die Leerzeichen enthalten, mssen Sie
+    innerhalb doppelter Anfhrungszeichen angeben. Dazu mssen Sie
+    die Option "usebackq" verwenden. Andernfalls werden doppelte
+    Anfhrungszeichen zur Definition eines auszuwertenden Literals ver-
+    wendet.
+
+    Dabei ist "%i" explizit deklariert, w„hrend "%j" und "%k" implizit
+    durch die Option "tokens=" deklariert werden. Sie k”nnen bis zu
+    26 Token durch diese Option angeben, vorausgesetzt, es wird da-
+    durch nicht versucht, eine Variable mit einem Buchstaben gr”áer als
+    "z" zu deklarieren. Bedachten Sie, dass FOR-Variablen aus nur
+    einem Buchstaben bestehen, Groá-/Kleinschreibung beachtet wer-
+    den muss, dass sie global sind und nicht mehr als insgesamt 52
+    gleichzeitig aktiv sein drfen.
+
+    Sie k”nnen den Befehl "FOR /F" auch direkt mit einer Zeichenfolge
+    verwenden, indem Sie die Zeichenfolge in doppelten Anfhrungszei-
+    chen als Dateiensatz zwischen den Klammern angeben. Diese Zei-
+    chenfolge wird dabei als einzelne Zeile einer Datei betrachtet und
+    ausgewertet.
+
+    Schlieálich k”nnen Sie den Befehl "FOR /F" auch verwenden, um
+    die Ausgabe eines Befehls auszuwerten. Dazu geben Sie eine Zei-
+    chenfolge in einfachen Anfhrungszeichen als Dateiensatz zwischen
+    den Klammern an. Diese  Zeichenfolge wird dabei als Befehlszeile
+    betrachtet und von einer untergeordneten "CMD.EXE" ausgefhrt.
+    Die Ausgabe dieses Befehls wird dann wie eine normale Datei ausge-
+    wertet. Das folgende Beispiel listet die Umgebungsvariablen im
+    aktuellen Verzeichnis auf:
+
+        FOR /F " usebackq delims==" %i IN (`set`) DO @echo %i
+
+Zus„tzlich wurde die Ersetzung von Verweisen auf FOR-Variablen erweitert.
+Sie k”nnen jetzt folgende Syntax verwenden:
+
+    %~I         - Expandiert %I und entfernt alle umschlieáenden 
+                   Anfhrungszeichen (").
+    %~fI        - Expandiert %I zu einem vollst„ndigen Dateinamen.
+    %~dI        - erstellt nur den Laufwerkbuchstaben von %I.
+    %~pI        - erstellt nur den Pfad von %I.
+    %~nI        - erstellt nur den Dateinamen von %I.
+    %~xI        - erstellt nur die Dateierweiterung von %I.
+    %~sI        - erstellter Pfad enth„lt nur kurze Dateinamen.
+    %~aI        - erstellt die Dateiattribute von %I.
+    %~tI        - erstellt Datum und Zeit von %I.
+    %~zI        - erstellt die Dateigr”áe von %I.
+    %~$PATH:I   - Durchsucht die in der PATH-Umgebungsvariablen
+                   angegebenen Verzeichnisse und expandiert die erste
+                   gefundene Datei %I zu dem vollst„ndigen Dateinamen.
+                   Wenn der Name der Umgebungsvariablen nicht definiert
+                   ist oder diese Datei bei der Suche nicht gefunden wurde,
+                   wird dieser Parameter zu einer leeren Zeichenfolge
+                   expandiert.
+
+Diese Parameter k”nnen auch miteinander kombiniert werden:
+
+    %~dpI       - erstellt den Laufwerkbuchstaben und Pfad von %I.
+    %~nxI       - erstellt den Dateinamen und die Dateierweiterung von %I.
+    %~fsI       - Expandiert %I zu einem vollst„ndigen Namen, der nur
+                   kurze Dateinamen enth„lt.
+    %~dp$PATH:I - Durchsucht die in der PATH-Umgebungsvariablen
+                   angegebenen Verzeichnisse nach %I und erstellt den
+                   Laufwerkbuchstaben und Pfad der ersten gefundenen Datei.
+    %~ftzaI     - Expandiert %I zu einer Zeile, die der Ausgabe des DIR-
+                   Befehls entspricht.
+
+In den angegebenen Beispielen k”nnen %I und PATH durch andere gltige
+Werte ersetzt werden. Der Ausdruck %~ wird durch einen gltigen Variablen-
+namen fr FOR abgeschlossen. Die Verwendung von Groábuchstaben fr die Namen
+von Variablen, wie z. B. %I, macht diese Ausdrcke leichter lesbar und
+vermeidet Verwechslungen mit den eigentlichen Parametern.
+
